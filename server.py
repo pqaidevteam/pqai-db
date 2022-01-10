@@ -1,8 +1,8 @@
 import os
 import dotenv
 import uvicorn
-import crud
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
+from core import crud
 
 dotenv.load_dotenv()
 
@@ -12,23 +12,21 @@ app = FastAPI()
 
 @app.get('/docs/{doc_id}')
 async def get_doc(doc_id):
-    pass
+    return crud.get_doc(doc_id)
 
 @app.get('/docs/{doc_id}/drawings')
 async def list_drawings(doc_id):
-    pass
+    return crud.list_drawings(doc_id)
 
 @app.get('/docs/{doc_id}/drawings/{n}')
 async def get_drawing(doc_id, n):
-    pass
-
-@app.get('/docs/{doc_id}/thumbnails')
-async def list_thumbnails(doc_id):
-    pass
+    image = crud.get_drawing(doc_id, n)
+    return Response(content=image, media_type='image/tiff')
 
 @app.get('/docs/{doc_id}/thumbnails/{n}')
 async def get_thumbnail(doc_id, n):
-    pass
+    image = crud.get_thumbnail(doc_id, n)
+    return Response(content=image, media_type='image/tiff')
 
 @app.post('/docs/{doc_id}')
 async def add_doc(doc_id):
