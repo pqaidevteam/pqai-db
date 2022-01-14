@@ -46,7 +46,7 @@ class TestS3BucketOperations(unittest.TestCase):
         self.test_bucket = S3Bucket(self.TEST_BUCKET_NAME)
         self.test_key = 'patents/US7654321B2.json'
         local_file = str((TEST_DIR / 'US7654321B2.json').resolve())
-        with open(local_file, 'r') as f:
+        with open(local_file, 'r', encoding='UTF-8') as f:
             self.test_data = f.read()
 
     def _reset_test_bucket(self):
