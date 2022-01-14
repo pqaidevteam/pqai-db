@@ -54,19 +54,5 @@ async def get_drawing(doc_id, drawing_num):
     image = crud.get_drawing(doc_id, drawing_num)
     return Response(content=image, media_type='image/tiff')
 
-@app.get('/docs/{doc_id}/thumbnails/{thumbnail_num}')
-async def get_thumbnail(doc_id, thumbnail_num):
-    """Return a (scaled-down) version of a drawing
-
-    Args:
-        doc_id (str): Document identifier (e.g. patent number)
-        thumbnail_num (TYPE): Description
-
-    Returns:
-        bytes: Image data
-    """
-    image = crud.get_thumbnail(doc_id, thumbnail_num)
-    return Response(content=image, media_type='image/tiff')
-
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=PORT)
