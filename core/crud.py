@@ -47,7 +47,12 @@ def _drawing_prefix(doc_id):
         return f'images/{num}-'
 
 def get_thumbnail(doc_id, n, h=200, w=None):
-    pass
+    """TODO: Scale down the image
+    """
+    key_prefix = _drawing_prefix(doc_id)
+    key = f'{key_prefix}{n}.tif'
+    tif_data = s3_bucket.get(key)
+    return tif_data
 
 def add_doc_json(doc_id, json_data):
     pass
