@@ -96,7 +96,7 @@ class TestS3BucketOperations(unittest.TestCase):
         self.test_bucket.put(self.test_key, self.test_data)
         self.assertObjectCount(1)
         downloaded = self.test_bucket.get(self.test_key)
-        self.assertEqual(downloaded, self.test_data)
+        self.assertEqual(downloaded, str.encode(self.test_data))
         self.test_bucket.delete(self.test_key)
         self.assertObjectCount(0)
 
