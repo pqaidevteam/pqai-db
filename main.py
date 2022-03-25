@@ -10,7 +10,6 @@ import uvicorn
 from fastapi import FastAPI, Response
 import errno
 from core import crud
-from core.local_storage_wrapper import LocalStorage
 dotenv.load_dotenv()
 
 PORT = int(os.environ['PORT'])
