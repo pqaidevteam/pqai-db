@@ -4,7 +4,6 @@ This is a custom wrapper around the PQAI local storage
 
 import os
 import errno
-import regex
 
 class LocalStorage:
 
