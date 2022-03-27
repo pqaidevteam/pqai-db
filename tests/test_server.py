@@ -61,6 +61,7 @@ class TestServer(unittest.TestCase):
         is_file = os.path.exists(path) #should exist
         self.assertTrue(is_file)
 
+        
         url = f'{PROTOCOL}://{HOST}:{PORT}' + route
         response = requests.delete(url)
         self.assertEqual(200, response.status_code)

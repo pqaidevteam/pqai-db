@@ -9,8 +9,8 @@ import shutil
 from pathlib import Path
 
 TEST_DIR = Path(__file__).parent
-BASE_DIR = Path(__file__).parent.parent
-sys.path.append(str(BASE_DIR.resolve()))
+BASE_DIR = Path(__file__).parent.resolve().parent
+sys.path.append(str(BASE_DIR))
 
 from core.local_storage_wrapper import LocalStorage
 

@@ -9,7 +9,7 @@ import dotenv
 import uvicorn
 from fastapi import FastAPI, Response
 import errno
-from core import crud
+from core import crud, local_crud
 dotenv.load_dotenv()
 
 PORT = int(os.environ['PORT'])
@@ -30,15 +30,15 @@ async def get_doc(doc_id):
     
 @app.delete('/docs/{doc_id}')
 async def delete_doc(doc_id):
+    """Delete the document
 
-    file_path = os.getcwd()+ f'/tests/test-dir/patents/{doc_id}.json'
-    if os.path.exists(file_path):
-        os.remove(file_path)
-        print("File Sucessfully Deleted")
-    else:
-        raise FileNotFoundError(errno.ENOENT,
-                                    os.strerror(errno.ENOENT),
-                                    file_path)
+    Args:
+        doc_id (str): Document identifier (e.g. patent number)
+
+    Returns:
+       None
+    """
+    return local_crud.delete_doc(doc_id)
 
 @app.get('/docs/{doc_id}/drawings')
 async def list_drawings(doc_id):
