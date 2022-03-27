@@ -8,7 +8,6 @@ import os
 import dotenv
 import uvicorn
 from fastapi import FastAPI, Response
-import errno
 from core import crud, local_crud
 dotenv.load_dotenv()
 
