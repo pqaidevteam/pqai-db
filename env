@@ -1,0 +1,4 @@
+PORT=80
+AWS_S3_BUCKET_NAME=<Your Bucket Name>
+AWS_ACCESS_KEY_ID=<AWS Access KEY ID>
+AWS_SECRET_ACCESS_KEY=<AWS Secret Access Key>
