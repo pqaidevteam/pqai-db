@@ -8,7 +8,7 @@ import os
 import dotenv
 import uvicorn
 from fastapi import FastAPI, Response
-from core import crud, local_crud
+from core import crud
 dotenv.load_dotenv()
 
 PORT = int(os.environ['PORT'])
@@ -37,7 +37,7 @@ async def delete_doc(doc_id):
     Returns:
        None
     """
-    return local_crud.delete_doc(doc_id)
+    crud.delete_doc(doc_id)
 
 @app.get('/docs/{doc_id}/drawings')
 async def list_drawings(doc_id):
