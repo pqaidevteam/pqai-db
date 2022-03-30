@@ -48,12 +48,13 @@ def delete_doc(doc_id):
     Returns:
        None
     """
+    key = f'patents/{doc_id}.json'
     if storage == "local":
-        key = f'patents/{doc_id}.json'
         local_storage.delete(key)
     
     else:
-        pass  # delete_doc implementation for s3
+        pass
+        #s3_bucket.delete(key) untested
 
 def list_drawings(doc_id):
     """Summary

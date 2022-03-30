@@ -51,28 +51,26 @@ class TestServer(unittest.TestCase):
     def test_delete_route(self):
         """ Can Delete File
         """
-        route = '/docs/US7654321A2'
-        pn = route.split('/')[-1] + '.json'
+        pn = 'US7654321A2'
+        route = '/docs/' + pn
         data = b'{"test_key": "test_value"}'
-        path = str((TEST_DIR / 'test-dir/patents' / pn).resolve())
+        pn_file = pn + '.json'
+        path = str((TEST_DIR / 'test-dir/patents' / pn_file).resolve())
         with open(path, 'wb') as f:
             f.write(data)
 
         is_file = os.path.exists(path) #should exist
         self.assertTrue(is_file)
 
-        
         url = f'{PROTOCOL}://{HOST}:{PORT}' + route
-        response = requests.delete(url)
+        response = self.call_route(route,'delete')
         self.assertEqual(200, response.status_code)
 
         is_file = os.path.exists(path) # shouldn't exist
         self.assertFalse(is_file)
         
-        
-	
     @staticmethod
-    def call_route(route):
+    def call_route(route, method = 'get'):
         """Make a GET request to a specific route
 
         Args:
@@ -81,8 +79,9 @@ class TestServer(unittest.TestCase):
         Returns:
             Response: Response object from `requests` module
         """
+        
         url = f'{PROTOCOL}://{HOST}:{PORT}' + route
-        response = requests.get(url)
+        response = requests.__getattribute__(method)(url)
         return response
 
 if __name__ == '__main__':
