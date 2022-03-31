@@ -9,7 +9,6 @@ import dotenv
 import uvicorn
 from fastapi import FastAPI, Response
 from core import crud
-
 dotenv.load_dotenv()
 
 PORT = int(os.environ['PORT'])
@@ -27,6 +26,18 @@ async def get_doc(doc_id):
         dict: Document data
     """
     return crud.get_doc(doc_id)
+    
+@app.delete('/docs/{doc_id}')
+async def delete_doc(doc_id):
+    """Delete the document
+
+    Args:
+        doc_id (str): Document identifier (e.g. patent number)
+
+    Returns:
+       None
+    """
+    crud.delete_doc(doc_id)
 
 @app.get('/docs/{doc_id}/drawings')
 async def list_drawings(doc_id):

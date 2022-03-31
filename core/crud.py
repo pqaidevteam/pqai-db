@@ -10,14 +10,21 @@ storage or multiple storages (e.g. separate for text and image data, etc.)
 import os
 import json
 import re
+from pathlib import Path
 
 import dotenv
 from core.s3wrapper import S3Bucket
+from core.local_storage_wrapper import LocalStorage
 
 dotenv.load_dotenv()
 
 AWS_S3_BUCKET_NAME = os.environ['AWS_S3_BUCKET_NAME']
 s3_bucket = S3Bucket(AWS_S3_BUCKET_NAME)
+storage = os.environ['STORAGE']
+
+BASE_DIR = Path(__file__).parent.parent
+FILE_DIR = str((BASE_DIR / 'tests/test-dir').resolve())
+local_storage = LocalStorage(FILE_DIR)
 
 def get_doc(doc_id):
     """Get a document data gives document identifier (e.g. patent number)
@@ -31,6 +38,23 @@ def get_doc(doc_id):
     key = f'patents/{doc_id}.json'
     contents = s3_bucket.get(key).decode()
     return json.loads(contents)
+
+def delete_doc(doc_id):
+    """Delete the document with the given document identifier
+
+    Args:
+        doc_id (str): Document identifier (e.g. patent number)
+
+    Returns:
+       None
+    """
+    key = f'patents/{doc_id}.json'
+    if storage == "local":
+        local_storage.delete(key)
+    
+    else:
+        pass
+        #s3_bucket.delete(key) untested
 
 def list_drawings(doc_id):
     """Summary

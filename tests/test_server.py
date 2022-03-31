@@ -23,7 +23,7 @@ class TestServer(unittest.TestCase):
 
     """Test the REST API routes
     """
-
+    
     def test_document_route(self):
         """Can retrieve a document's data
         """
@@ -48,8 +48,29 @@ class TestServer(unittest.TestCase):
         response = self.call_route('/docs/US7654321B2/drawings/1')
         self.assertEqual(200, response.status_code)
 
+    def test_delete_route(self):
+        """ Can Delete File
+        """
+        pn = 'US7654321A2'
+        route = '/docs/' + pn
+        data = b'{"test_key": "test_value"}'
+        pn_file = pn + '.json'
+        path = str((TEST_DIR / 'test-dir/patents' / pn_file).resolve())
+        with open(path, 'wb') as f:
+            f.write(data)
+
+        is_file = os.path.exists(path) #should exist
+        self.assertTrue(is_file)
+
+        url = f'{PROTOCOL}://{HOST}:{PORT}' + route
+        response = self.call_route(route,'delete')
+        self.assertEqual(200, response.status_code)
+
+        is_file = os.path.exists(path) # shouldn't exist
+        self.assertFalse(is_file)
+        
     @staticmethod
-    def call_route(route):
+    def call_route(route, method = 'get'):
         """Make a GET request to a specific route
 
         Args:
@@ -58,8 +79,9 @@ class TestServer(unittest.TestCase):
         Returns:
             Response: Response object from `requests` module
         """
+        
         url = f'{PROTOCOL}://{HOST}:{PORT}' + route
-        response = requests.get(url)
+        response = requests.__getattribute__(method)(url)
         return response
 
 if __name__ == '__main__':
