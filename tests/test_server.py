@@ -17,13 +17,20 @@ sys.path.append(str(BASE_DIR.resolve()))
 
 PROTOCOL = 'http'
 HOST = '127.0.0.1'
-PORT = os.environ['PORT']
+PORT = int(os.environ['PORT'])
 
+import socket
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_not_running = sock.connect_ex((HOST, PORT)) != 0
+if server_not_running:
+    print('Server is not running. All API tests will be skipped.')
+
+@unittest.skipIf(server_not_running, 'Works only when true')
 class TestServer(unittest.TestCase):
 
     """Test the REST API routes
     """
-    
+
     def test_document_route(self):
         """Can retrieve a document's data
         """
@@ -62,15 +69,14 @@ class TestServer(unittest.TestCase):
         is_file = os.path.exists(path) #should exist
         self.assertTrue(is_file)
 
-        url = f'{PROTOCOL}://{HOST}:{PORT}' + route
-        response = self.call_route(route,'delete')
+        response = self.call_route(route, 'delete')
         self.assertEqual(200, response.status_code)
 
         is_file = os.path.exists(path) # shouldn't exist
         self.assertFalse(is_file)
-        
+
     @staticmethod
-    def call_route(route, method = 'get'):
+    def call_route(route, method='get'):
         """Make a GET request to a specific route
 
         Args:
@@ -79,9 +85,9 @@ class TestServer(unittest.TestCase):
         Returns:
             Response: Response object from `requests` module
         """
-        
+
         url = f'{PROTOCOL}://{HOST}:{PORT}' + route
-        response = requests.__getattribute__(method)(url)
+        response = getattr(requests, method)(url)
         return response
 
 if __name__ == '__main__':
