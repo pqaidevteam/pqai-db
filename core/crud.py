@@ -13,21 +13,17 @@ import re
 from pathlib import Path
 
 import dotenv
+dotenv.load_dotenv()
+
 from core.s3wrapper import S3Bucket
 from core.local_storage_wrapper import LocalStorage
 
-dotenv.load_dotenv()
-
-AWS_S3_BUCKET_NAME = os.environ['AWS_S3_BUCKET_NAME']
-s3_bucket = S3Bucket(AWS_S3_BUCKET_NAME)
-storage = os.environ['STORAGE']
-
-BASE_DIR = Path(__file__).parent.parent
-FILE_DIR = str((BASE_DIR / 'tests/test-dir').resolve())
-local_storage = LocalStorage(FILE_DIR)
+S3_BUCKET = S3Bucket(os.environ['AWS_S3_BUCKET_NAME'])
+S3_BUCKET_DRAWINGS = S3Bucket(os.environ['S3_BUCKET_DRAWINGS'])
+LOCAL_STORAGE = LocalStorage(os.environ['LOCAL_STORAGE_ROOT'])
 
 def get_doc(doc_id):
-    """Get a document data gives document identifier (e.g. patent number)
+    """Get a document data given document identifier (e.g. patent number)
 
     Args:
         doc_id (str): Document identifier (e.g. patent number)
@@ -35,12 +31,17 @@ def get_doc(doc_id):
     Returns:
         dict: Document data
     """
+    active_storage = os.environ['STORAGE']
+    
     key = f'patents/{doc_id}.json'
-    contents = s3_bucket.get(key).decode()
+    if active_storage == 's3':
+        contents = S3_BUCKET.get(key).decode()
+    elif active_storage == 'local':
+        contents = LOCAL_STORAGE.get(key).decode()
     return json.loads(contents)
 
 def delete_doc(doc_id):
-    """Delete the document with the given document identifier
+    """Delete a document
 
     Args:
         doc_id (str): Document identifier (e.g. patent number)
@@ -49,12 +50,11 @@ def delete_doc(doc_id):
        None
     """
     key = f'patents/{doc_id}.json'
-    if storage == "local":
-        local_storage.delete(key)
-    
-    else:
-        pass
-        #s3_bucket.delete(key) untested
+    active_storage = os.environ['STORAGE']
+    if active_storage == "s3":
+        S3_BUCKET.delete(key)
+    elif active_storage == 'local':
+        LOCAL_STORAGE.delete(key)
 
 def list_drawings(doc_id):
     """Summary
@@ -66,7 +66,7 @@ def list_drawings(doc_id):
         list: Drawing identifiers, e.g. ["1", "2", "3"]
     """
     key_prefix = _drawing_prefix(doc_id)
-    keys = s3_bucket.list(key_prefix)
+    keys = S3_BUCKET_DRAWINGS.list(key_prefix)
     drawings = [re.search(r'-(\d+)', key).group(1) for key in keys]
     return drawings
 
@@ -82,7 +82,7 @@ def get_drawing(doc_id, drawing_num):
     """
     key_prefix = _drawing_prefix(doc_id)
     key = f'{key_prefix}{drawing_num}.tif'
-    tif_data = s3_bucket.get(key)
+    tif_data = S3_BUCKET_DRAWINGS.get(key)
     return tif_data
 
 def _drawing_prefix(doc_id):

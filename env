@@ -1,4 +1,7 @@
 PORT=80
 AWS_S3_BUCKET_NAME=<Your Bucket Name>
+S3_BUCKET_DRAWINGS=<Your Bucket Name>
 AWS_ACCESS_KEY_ID=<AWS Access KEY ID>
 AWS_SECRET_ACCESS_KEY=<AWS Secret Access Key>
+STORAGE=<'s3' or 'local'>
+LOCAL_STORAGE_ROOT=<Absolute local path where data is stored>

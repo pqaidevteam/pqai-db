@@ -26,7 +26,7 @@ async def get_doc(doc_id):
         dict: Document data
     """
     return crud.get_doc(doc_id)
-    
+
 @app.delete('/docs/{doc_id}')
 async def delete_doc(doc_id):
     """Delete the document
