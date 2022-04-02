@@ -1,8 +1,8 @@
-"""Summary
+"""Server
 
 Attributes:
-    app (TYPE): Description
-    PORT (TYPE): Description
+    app (fastapi.applications.FastAPI): FastAPI instance
+    PORT (int): Port number
 """
 import os
 import dotenv
