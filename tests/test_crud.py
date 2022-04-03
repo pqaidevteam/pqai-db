@@ -10,17 +10,18 @@ import os
 import sys
 import unittest
 from pathlib import Path
+import testutil
 
-import dotenv
-dotenv.load_dotenv()
-os.environ['AWS_S3_BUCKET_NAME'] = 'pqai.test'
+testutil.load_test_environment()
 
-TEST_DIR = Path(__file__).parent
+#pylint: disable=wrong-import-position
 BASE_DIR = Path(__file__).parent.parent
 sys.path.append(str(BASE_DIR.resolve()))
-
 from core import crud
-import testutil
+
+# This is important to make sure the tests do not run on the production
+# S3 bucket - because some tests may delete certain files
+os.environ['AWS_S3_BUCKET_NAME'] = 'pqai.test'
 
 class TestOperations(unittest.TestCase):
 

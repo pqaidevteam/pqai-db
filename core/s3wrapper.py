@@ -3,10 +3,7 @@ This is a custom wrapper around the PQAI S3 bucket
 """
 
 import os
-import dotenv
 import boto3
-
-dotenv.load_dotenv()
 
 AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
 AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']

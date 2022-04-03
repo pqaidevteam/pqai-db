@@ -51,14 +51,11 @@ class LocalStorage:
         """
         path = self.root + '/' + rel_path
         if not os.path.exists(path):
-            raise FileNotFoundError(errno.ENOENT,
-                os.strerror(errno.ENOENT),
-                path
-            )
+            err = os.strerror(errno.ENOENT)
+            raise FileNotFoundError(errno.ENOENT, err, path)
         if not os.path.isfile(path):
             raise ValueError('Invalid file specified for deletion')
         os.remove(path)
-
 
     def list(self, path_prefix):
         """List the files matching the given prefix

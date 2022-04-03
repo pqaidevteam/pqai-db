@@ -2,18 +2,17 @@
 Unit test for custom wrapper around local storage
 """
 import unittest
-import os
 import sys
 import json
-import shutil
 from pathlib import Path
 
-TEST_DIR = Path(__file__).parent
 BASE_DIR = Path(__file__).parent.parent
 sys.path.append(str(BASE_DIR.resolve()))
 
+#pylint: disable=wrong-import-position
 from core.local_storage_wrapper import LocalStorage
 import testutil
+
 
 class TestLocalStorage(unittest.TestCase):
 

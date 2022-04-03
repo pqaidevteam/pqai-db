@@ -7,16 +7,15 @@ Unit test for custom wrapper around S3 storage
 import unittest
 import sys
 from pathlib import Path
-import dotenv
-
-dotenv.load_dotenv()
+import testutil
 
 TEST_DIR = Path(__file__).parent
 BASE_DIR = Path(__file__).parent.parent
-sys.path.append(str(BASE_DIR.resolve()))
 
+testutil.load_test_environment()
+
+sys.path.append(str(BASE_DIR.resolve()))
 from core.s3wrapper import S3Bucket
-import testutil
 
 class TestS3BucketOperations(unittest.TestCase):
 
@@ -51,6 +50,8 @@ class TestS3BucketOperations(unittest.TestCase):
         self.assertObjectCount(key, 1)
 
     def assertObjectCount(self, key, n):
+        """Assert that the S3 bucket contains 'n' objects matching to the key
+        """
         keys = self.test_bucket.list(key)
         self.assertEqual(n, len(keys))
 

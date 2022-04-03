@@ -2,24 +2,17 @@
 Test all server routes
 """
 import unittest
-import sys
 import os
-from pathlib import Path
+import socket
 import requests
+import testutil
 
-import dotenv
-
-dotenv.load_dotenv()
-
-TEST_DIR = Path(__file__).parent
-BASE_DIR = Path(__file__).parent.parent
-sys.path.append(str(BASE_DIR.resolve()))
+testutil.load_test_environment()
 
 PROTOCOL = 'http'
 HOST = '127.0.0.1'
 PORT = int(os.environ['PORT'])
 
-import socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_not_running = sock.connect_ex((HOST, PORT)) != 0
 if server_not_running:
@@ -59,21 +52,13 @@ class TestServer(unittest.TestCase):
         """ Can Delete File
         """
         pn = 'US7654321A2'
-        route = '/docs/' + pn
-        data = b'{"test_key": "test_value"}'
-        pn_file = pn + '.json'
-        path = str((TEST_DIR / 'test-dir/patents' / pn_file).resolve())
-        with open(path, 'wb') as f:
-            f.write(data)
-
-        is_file = os.path.exists(path) #should exist
-        self.assertTrue(is_file)
+        route = f'/docs/{pn}'
 
         response = self.call_route(route, 'delete')
         self.assertEqual(200, response.status_code)
 
-        is_file = os.path.exists(path) # shouldn't exist
-        self.assertFalse(is_file)
+        response = self.call_route(route, 'delete')
+        self.assertEqual(404, response.status_code)
 
     @staticmethod
     def call_route(route, method='get'):

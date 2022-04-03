@@ -1,3 +1,6 @@
 [FORMAT]
 # Good variable names which should always be accepted, separated by a comma
 good-names=i,j,k,_,f,x,y,z,pn
+
+[MESSAGES CONTROL]
+disable=C0103,E1101,E0401
