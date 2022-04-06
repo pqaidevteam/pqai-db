@@ -12,11 +12,16 @@ import json
 import re
 from core.s3wrapper import S3Bucket
 from core.local_storage_wrapper import LocalStorage
+from core.mongo_wrapper import Mongo
+
 
 S3_BUCKET = S3Bucket(os.environ['AWS_S3_BUCKET_NAME'])
 S3_BUCKET_DRAWINGS = S3Bucket(os.environ['S3_BUCKET_DRAWINGS'])
 LOCAL_STORAGE = LocalStorage(os.environ['LOCAL_STORAGE_ROOT'])
 STORAGE = os.environ['STORAGE']
+MONGO = Mongo()
+
+
 
 def get_doc(doc_id):
     """Get a document data given document identifier (e.g. patent number)
@@ -27,12 +32,20 @@ def get_doc(doc_id):
     Returns:
         dict: Document data
     """
-    key = f'patents/{doc_id}.json'
-    if STORAGE == 's3':
-        contents = S3_BUCKET.get(key).decode()
-    elif STORAGE == 'local':
-        contents = LOCAL_STORAGE.get(key).decode()
-    return json.loads(contents)
+
+    match STORAGE :
+        case "mongo":
+            return MONGO.get(doc_id)
+        case "local":
+            key = f'patents/{doc_id}.json'
+            contents = LOCAL_STORAGE.get(key).decode()
+            return json.loads(contents)
+        case "s3":
+            key = f'patents/{doc_id}.json'
+            contents = S3_BUCKET.get(key).decode()
+            return json.loads(contents)
+        case _: #default
+            pass
 
 def delete_doc(doc_id):
     """Delete a document
@@ -43,11 +56,18 @@ def delete_doc(doc_id):
     Returns:
        None
     """
-    key = f'patents/{doc_id}.json'
-    if STORAGE == "s3":
-        S3_BUCKET.delete(key)
-    elif STORAGE == 'local':
-        LOCAL_STORAGE.delete(key)
+
+    match STORAGE:
+        case "mongo":
+            MONGO.delete(doc_id)
+        case "local":
+            key = f'patents/{doc_id}.json'
+            LOCAL_STORAGE.delete(key)
+        case "s3":
+            key = f'patents/{doc_id}.json'
+            S3_BUCKET.delete(key)
+        case _: # default
+            pass
 
 def list_drawings(doc_id):
     """Summary
