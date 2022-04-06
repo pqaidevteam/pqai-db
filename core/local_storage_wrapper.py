@@ -9,7 +9,7 @@ class LocalStorage:
 
     """A wrapper class to hide the local storage's retrieval details.
     """
-    
+
     def __init__(self, root):
         """Creates an LocalStorage class
 
@@ -31,7 +31,7 @@ class LocalStorage:
         with open(path, 'rb') as f:
             contents = f.read()
         return contents
-    
+
     def put(self, rel_path, data):
         """Put a new data into the file
 
@@ -50,12 +50,12 @@ class LocalStorage:
             rel_path (str): file path
         """
         path = self.root + '/' + rel_path
-        if os.path.exists(path):
-            os.remove(path)
-        else:
-            raise FileNotFoundError(errno.ENOENT,
-                                    os.strerror(errno.ENOENT),
-                                    path)
+        if not os.path.exists(path):
+            err = os.strerror(errno.ENOENT)
+            raise FileNotFoundError(errno.ENOENT, err, path)
+        if not os.path.isfile(path):
+            raise ValueError('Invalid file specified for deletion')
+        os.remove(path)
 
     def list(self, path_prefix):
         """List the files matching the given prefix

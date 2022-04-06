@@ -3,10 +3,7 @@ This is a custom wrapper around the PQAI S3 bucket
 """
 
 import os
-import dotenv
 import boto3
-
-dotenv.load_dotenv()
 
 AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
 AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
@@ -14,11 +11,13 @@ AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
 def get_botoclient():
     """Connect to S3
     """
-    return boto3.client('s3',
-                        aws_access_key_id=AWS_ACCESS_KEY_ID,
-                        aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
+    credentials = {
+        'aws_access_key_id': AWS_ACCESS_KEY_ID,
+        'aws_secret_access_key': AWS_SECRET_ACCESS_KEY
+    }
+    return boto3.client('s3', **credentials)
 
-botoclient = get_botoclient()
+BOTO_CLIENT = get_botoclient()
 
 class S3Bucket:
 
@@ -42,7 +41,7 @@ class S3Bucket:
         Returns:
             bytes: Raw data of the object
         """
-        obj = botoclient.get_object(Bucket=self._bucket, Key=key)
+        obj = BOTO_CLIENT.get_object(Bucket=self._bucket, Key=key)
         contents = obj["Body"].read()
         return contents
 
@@ -53,7 +52,7 @@ class S3Bucket:
             key (str): Description
             data (bytes): Raw data of the object
         """
-        botoclient.put_object(Body=data, Key=key, Bucket=self._bucket)
+        BOTO_CLIENT.put_object(Body=data, Key=key, Bucket=self._bucket)
 
     def delete(self, key):
         """Remove an object from the S3 bucket
@@ -61,7 +60,7 @@ class S3Bucket:
         Args:
             key (str): Object's key
         """
-        botoclient.delete_object(Key=key, Bucket=self._bucket)
+        BOTO_CLIENT.delete_object(Key=key, Bucket=self._bucket)
 
     def list(self, key):
         """List the items matching the given key (used as a prefix)
@@ -74,7 +73,7 @@ class S3Bucket:
         Returns:
             list: Matching object keys
         """
-        response = botoclient.list_objects(Bucket=self._bucket, Prefix=key)
+        response = BOTO_CLIENT.list_objects(Bucket=self._bucket, Prefix=key)
         if not 'Contents' in response:
             return []
         items = response['Contents']
