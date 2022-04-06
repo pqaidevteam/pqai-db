@@ -7,13 +7,12 @@ in a remote location (e.g. and API or cloud storage). There can be single
 storage or multiple storages (e.g. separate for text and image data, etc.)
 """
 
-from email.policy import default
 import os
 import json
 import re
 from core.s3wrapper import S3Bucket
 from core.local_storage_wrapper import LocalStorage
-from core.mongoWrapper import Mongo
+from core.mongo_wrapper import Mongo
 
 
 S3_BUCKET = S3Bucket(os.environ['AWS_S3_BUCKET_NAME'])
@@ -40,7 +39,7 @@ def get_doc(doc_id):
         case "local":
             key = f'patents/{doc_id}.json'
             contents = LOCAL_STORAGE.get(key).decode()
-            json.loads(contents)
+            return json.loads(contents)
         case "s3":
             key = f'patents/{doc_id}.json'
             contents = S3_BUCKET.get(key).decode()
@@ -67,7 +66,6 @@ def delete_doc(doc_id):
         case "s3":
             key = f'patents/{doc_id}.json'
             S3_BUCKET.delete(key)
-            pass
         case _: # default
             pass
 
