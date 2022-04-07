@@ -3,34 +3,20 @@ This is a custom wrapper around the PQAI MongoDB
 """
 
 # Later pooling system can be used
-# Bootstrapping the DB 
+# Bootstrapping the DB
 
 import os
 import dotenv
-import boto3
 import pymongo
-import json
 
 dotenv.load_dotenv()
 
 MONGO_USERNAME = os.environ['MONGO_USERNAME']
 MONGO_PASSWORD = os.environ['MONGO_PASSWORD']
-MONGO_URL = os.environ['MONGO_URL']
+MONGO_HOST = os.environ['MONGO_HOST']
+MONGO_DB = 'pqai'
+MONGO_COLL = 'docs'
 
-
-def getMongoClient():
-    """Connect to Mongo
-    """
-
-    uri = "mongodb://{}:{}@{}:27017/".format(MONGO_USERNAME, MONGO_PASSWORD, MONGO_URL)
-
-    client = pymongo.MongoClient(uri)
-    db = client["pqai"]
-    collection = db["docs"]
-
-    return collection
-
-collection = getMongoClient()
 
 class Mongo:
 
@@ -38,30 +24,33 @@ class Mongo:
     """
 
     def __init__(self):
-        """Creates a Mongo class
-        """
-        pass
+        uri = "mongodb://{}:{}@{}:27017/".format(MONGO_USERNAME, MONGO_PASSWORD, MONGO_HOST)
+        client = pymongo.MongoClient(uri)
+        self.coll = client[MONGO_DB][MONGO_COLL]
 
     def get(self, key):
-        """Get the raw binary data of an object from Mongo
+        """Get an object from Mongo
 
         Args:
             key (str): Object's key
 
         Returns:
-            JSON: data of the object
+            dict: data of the object
         """
-        doc_data = collection.find_one({"_id": key})
+        doc_data = self.coll.find_one({"_id": key})
+        if doc_data is None:
+            raise Exception('Document not found in Mongo DB')
         return doc_data
 
-    def put(self, data):
-        """Put a new object into the S3 bucket
+    def put(self, key, data):
+        """Add a new document to the Mongo database
 
         Args:
             key (str): Description
-            data (bytes): JSON object
+            data (dict): JSON data
         """
-        collection.insert_one(data)
+        data['_id'] = key
+        self.coll.insert_one(data)
 
     def delete(self, key):
         """Remove an object from the mongo
@@ -69,7 +58,7 @@ class Mongo:
         Args:
             key (str): Object's key
         """
-        collection.delete_one({"_id": key})
+        self.coll.delete_one({"_id": key})
 
     def list(self, key):
         """List the items matching the given key (used as a prefix)
@@ -82,4 +71,5 @@ class Mongo:
         Returns:
             list: Matching data keys
         """
-        return list(collection.find({ "_id": { "$regex": '{}.*'.format(key), "$options": 'i' } }).limit(1000))
+        query = {"_id": {"$regex": '{}.*'.format(key), "$options": 'i'}}
+        return list(self.coll.find(query).limit(1000))
