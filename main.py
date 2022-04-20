@@ -4,12 +4,16 @@ Attributes:
     app (fastapi.applications.FastAPI): FastAPI instance
     PORT (int): Port number
 """
-import dotenv
-dotenv.load_dotenv()
+
 
 import os
 import uvicorn
 from fastapi import FastAPI, Response
+
+import dotenv
+dotenv.load_dotenv()
+
+#pylint: disable=wrong-import-position
 from core import crud
 
 PORT = int(os.environ['PORT'])
