@@ -15,6 +15,9 @@ services:
       - AWS_S3_BUCKET_NAME=${AWS_S3_BUCKET_NAME}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      # - MONGO_HOST=mongo
+      # - MONGO_USERNAME=root
+      # - MONGO_PASSWORD=example
   # mongo: # Enable it when want to use mongo as data source
   #   image: mongo:5.0.6
   #   restart: always
