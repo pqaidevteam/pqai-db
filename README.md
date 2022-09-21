@@ -37,10 +37,12 @@ To make a contribution, please follow these steps:
 
 1. Fork this repository.
 2. Create a new branch with a descriptive name
-3. Make the changes you want and add new tests, if needed
-4. Make sure all tests are passing
-5. Commit your changes
-6. Submit a pull request
+3. Make copy of env file as .env and docker-compose.dev.yml as docker-compose.yml
+4. Bring DB to life `docker-compose up`
+5. Make the changes you want and add new tests, if needed
+6. Make sure all tests are passing `docker exec -i dev_pqai_db_api python -m unittest discover ./tests/`
+7. Commit your changes
+8. Submit a pull request
 
 ## Support
 
