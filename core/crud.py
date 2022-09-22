@@ -22,6 +22,15 @@ STORAGE = os.environ['STORAGE']
 MONGO = Mongo()
 
 
+class switch(object):
+    value = None
+    def __new__(class_, value):
+        class_.value = value
+        return True
+
+def case(*args):
+    return any((arg == switch.value for arg in args))
+
 
 def get_doc(doc_id):
     """Get a document data given document identifier (e.g. patent number)
@@ -33,19 +42,18 @@ def get_doc(doc_id):
         dict: Document data
     """
 
-    match STORAGE :
-        case "mongo":
+    while switch(STORAGE):
+        if case("mongo"):
             return MONGO.get(doc_id)
-        case "local":
+        if case("local"):
             key = f'patents/{doc_id}.json'
             contents = LOCAL_STORAGE.get(key).decode()
             return json.loads(contents)
-        case "s3":
+        if case("s3"):
             key = f'patents/{doc_id}.json'
             contents = S3_BUCKET.get(key).decode()
             return json.loads(contents)
-        case _: #default
-            pass
+
 
 def delete_doc(doc_id):
     """Delete a document
@@ -57,17 +65,15 @@ def delete_doc(doc_id):
        None
     """
 
-    match STORAGE:
-        case "mongo":
+    while switch(STORAGE):
+        if case("mongo"):
             MONGO.delete(doc_id)
-        case "local":
+        if case("local"):
             key = f'patents/{doc_id}.json'
             LOCAL_STORAGE.delete(key)
-        case "s3":
+        if case("s3"):
             key = f'patents/{doc_id}.json'
             S3_BUCKET.delete(key)
-        case _: # default
-            pass
 
 def list_drawings(doc_id):
     """Summary
