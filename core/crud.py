@@ -15,12 +15,23 @@ from core.local_storage_wrapper import LocalStorage
 from core.mongo_wrapper import Mongo
 
 
-S3_BUCKET = S3Bucket(os.environ['AWS_S3_BUCKET_NAME'])
-S3_BUCKET_DRAWINGS = S3Bucket(os.environ['S3_BUCKET_DRAWINGS'])
-LOCAL_STORAGE = LocalStorage(os.environ['LOCAL_STORAGE_ROOT'])
-STORAGE = os.environ['STORAGE']
+S3_BUCKET = S3Bucket(os.environ["AWS_S3_BUCKET_NAME"])
+S3_BUCKET_DRAWINGS = S3Bucket(os.environ["S3_BUCKET_DRAWINGS"])
+LOCAL_STORAGE = LocalStorage(os.environ["LOCAL_STORAGE_ROOT"])
+STORAGE = os.environ["STORAGE"]
 MONGO = Mongo()
 
+
+class switch(object):
+    value = None
+
+    def __new__(class_, value):
+        class_.value = value
+        return True
+
+
+def case(*args):
+    return any((arg == switch.value for arg in args))
 
 
 def get_doc(doc_id):
@@ -33,19 +44,18 @@ def get_doc(doc_id):
         dict: Document data
     """
 
-    match STORAGE :
-        case "mongo":
+    while switch(STORAGE):
+        if case("mongo"):
             return MONGO.get(doc_id)
-        case "local":
-            key = f'patents/{doc_id}.json'
+        if case("local"):
+            key = f"patents/{doc_id}.json"
             contents = LOCAL_STORAGE.get(key).decode()
             return json.loads(contents)
-        case "s3":
-            key = f'patents/{doc_id}.json'
+        if case("s3"):
+            key = f"patents/{doc_id}.json"
             contents = S3_BUCKET.get(key).decode()
             return json.loads(contents)
-        case _: #default
-            pass
+
 
 def delete_doc(doc_id):
     """Delete a document
@@ -57,17 +67,16 @@ def delete_doc(doc_id):
        None
     """
 
-    match STORAGE:
-        case "mongo":
+    while switch(STORAGE):
+        if case("mongo"):
             MONGO.delete(doc_id)
-        case "local":
-            key = f'patents/{doc_id}.json'
+        if case("local"):
+            key = f"patents/{doc_id}.json"
             LOCAL_STORAGE.delete(key)
-        case "s3":
-            key = f'patents/{doc_id}.json'
+        if case("s3"):
+            key = f"patents/{doc_id}.json"
             S3_BUCKET.delete(key)
-        case _: # default
-            pass
+
 
 def list_drawings(doc_id):
     """Summary
@@ -80,8 +89,9 @@ def list_drawings(doc_id):
     """
     key_prefix = _drawing_prefix(doc_id)
     keys = S3_BUCKET_DRAWINGS.list(key_prefix)
-    drawings = [re.search(r'-(\d+)', key).group(1) for key in keys]
+    drawings = [re.search(r"-(\d+)", key).group(1) for key in keys]
     return drawings
+
 
 def get_drawing(doc_id, drawing_num):
     """Summary
@@ -94,9 +104,10 @@ def get_drawing(doc_id, drawing_num):
         bytes: Image data
     """
     key_prefix = _drawing_prefix(doc_id)
-    key = f'{key_prefix}{drawing_num}.tif'
+    key = f"{key_prefix}{drawing_num}.tif"
     tif_data = S3_BUCKET_DRAWINGS.get(key)
     return tif_data
+
 
 def _drawing_prefix(doc_id):
     """Maps document ids to their drawing path prefixes
@@ -121,9 +132,9 @@ def _drawing_prefix(doc_id):
         str: Drawing prefix
     """
     if len(doc_id) > 12:
-        return f'images/{doc_id}-'
+        return f"images/{doc_id}-"
 
-    num = re.search(r'\d+', doc_id).group(0)
+    num = re.search(r"\d+", doc_id).group(0)
     while len(num) < 8:
-        num = '0' + num
-    return f'images/{num}-'
+        num = "0" + num
+    return f"images/{num}-"
