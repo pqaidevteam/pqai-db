@@ -4,9 +4,16 @@ This is a custom wrapper around the PQAI S3 bucket
 
 import os
 import boto3
+import botocore
 
-AWS_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
-AWS_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+
+config = botocore.config.Config(
+    read_timeout=400,
+    connect_timeout=400,
+    retries={"max_attempts": 0}
+)
 
 def get_botoclient():
     """Connect to S3
@@ -15,9 +22,10 @@ def get_botoclient():
         'aws_access_key_id': AWS_ACCESS_KEY_ID,
         'aws_secret_access_key': AWS_SECRET_ACCESS_KEY
     }
-    return boto3.client('s3', **credentials)
+    return boto3.client('s3', **credentials, config=config)
 
 BOTO_CLIENT = get_botoclient()
+
 
 class S3Bucket:
 
