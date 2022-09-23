@@ -11,9 +11,9 @@ import pymongo
 
 dotenv.load_dotenv()
 
-MONGO_USERNAME = os.environ['MONGO_USERNAME']
-MONGO_PASSWORD = os.environ['MONGO_PASSWORD']
-MONGO_HOST = os.environ['MONGO_HOST']
+MONGO_USERNAME = os.environ.get('MONGO_USERNAME')
+MONGO_PASSWORD = os.environ.get('MONGO_PASSWORD')
+MONGO_HOST = os.environ.get('MONGO_HOST')
 MONGO_DB = 'pqai'
 MONGO_COLL = 'docs'
 
