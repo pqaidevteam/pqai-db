@@ -21,7 +21,7 @@ from core import crud
 
 # This is important to make sure the tests do not run on the production
 # S3 bucket - because some tests may delete certain files
-os.environ['AWS_S3_BUCKET_NAME'] = 'pqai.test'
+os.environ['AWS_S3_BUCKET_NAME'] = 'pqai.test1'
 
 class TestOperations(unittest.TestCase):
 

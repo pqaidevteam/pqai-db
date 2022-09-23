@@ -24,8 +24,8 @@ MONGO = Mongo()
 
 class switch(object):
     value = None
-    def __new__(class_, value):
-        class_.value = value
+    def __new__(cls, value):
+        cls.value = value
         return True
 
 def case(*args):

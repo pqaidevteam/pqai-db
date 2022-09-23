@@ -2,16 +2,14 @@
 Unit test for custom wrapper around S3 storage
 """
 
-# pylint: disable=C0103,C0413
-
 import unittest
 import sys
 from pathlib import Path
-import testutil
 
 TEST_DIR = Path(__file__).parent
 BASE_DIR = Path(__file__).parent.parent
 
+import testutil
 testutil.load_test_environment()
 
 sys.path.append(str(BASE_DIR.resolve()))
@@ -24,14 +22,10 @@ class TestS3BucketOperations(unittest.TestCase):
     """
 
     def setUp(self):
-        """Initial setup
-        """
         self._bucket_name = testutil.TestS3BucketCreator().create()
         self.test_bucket = S3Bucket(self._bucket_name)
 
     def test_operations(self):
-        """Test list, get, delete, and put operations
-        """
         filename = 'US7654321B2.json'
         key = f'patents/{filename}'
 
@@ -50,8 +44,6 @@ class TestS3BucketOperations(unittest.TestCase):
         self.assertObjectCount(key, 1)
 
     def assertObjectCount(self, key, n):
-        """Assert that the S3 bucket contains 'n' objects matching to the key
-        """
         keys = self.test_bucket.list(key)
         self.assertEqual(n, len(keys))
 

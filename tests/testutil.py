@@ -24,7 +24,7 @@ class TestS3BucketCreator():
     def __init__(self):
         """Initialize
         """
-        self._bucket_name = os.environ['AWS_S3_BUCKET_NAME']
+        self._bucket_name = "pqai.test1"
         self._files = [
             str((TEST_DIR / 'US7654321B2.json').resolve()),
             str((TEST_DIR / 'US20080156487A1.json').resolve())
