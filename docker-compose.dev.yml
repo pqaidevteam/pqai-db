@@ -2,28 +2,23 @@ version: '3'
 
 services:
   pqai_db_api:
-    container_name: dev_pqai_db_api
+    container_name: pqai_db_api_dev
     build: .
     command: bash -c "pip install --no-cache-dir --upgrade -r /code/requirements.txt && uvicorn main:app --host 0.0.0.0 --port 80 --reload"
     restart: always
     ports: 
       - 8000:80
     volumes:
-      - ./:/code
+      - ./:/app
     environment:
-      - PORT=${PORT} # Default should be 80 in env file
+      - PORT=${PORT}
       - AWS_S3_BUCKET_NAME=${AWS_S3_BUCKET_NAME}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      # - MONGO_HOST=mongo
-      # - MONGO_USERNAME=root
-      # - MONGO_PASSWORD=example
-  # mongo: # Enable it when want to use mongo as data source
-  #   image: mongo:5.0.6
-  #   restart: always
-  #   environment:
-  #     - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
-  #     - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
-  #   volumes:
-  #     - ./mongo-volume:/data/db
-
+      - MONGO_HOST=${MONGO_HOST}
+      - MONGO_PORT=${MONGO_PORT}
+      - MONGO_USER=${MONGO_USER}
+      - MONGO_PASS=${MONGO_PASS}
+      - MONGO_DB=${MONGO_DB}
+      - MONGO_COLL=${MONGO_COLL}
+      - STORAGE=${STORAGE}
