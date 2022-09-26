@@ -24,7 +24,7 @@ MONGO_URI = f"mongodb://{MONGO_USER}:{MONGO_PASS}@{MONGO_HOST}:{MONGO_PORT}"
 
 from core.storage import LocalStorage, S3Bucket, MongoDB
 
-@unittest.skip("temp")
+
 class TestLocalStorage(unittest.TestCase):
     
     def setUp(self):
@@ -60,7 +60,7 @@ class TestLocalStorage(unittest.TestCase):
         self.assertFalse(os.path.exists(path))
         self.assertFalse(self.storage.exists(key))
 
-@unittest.skip("temp")
+
 class TestS3Bucket(unittest.TestCase):
     
     def setUp(self):
