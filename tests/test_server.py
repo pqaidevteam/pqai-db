@@ -1,50 +1,67 @@
 import unittest
-import os
-import socket
-import requests
+import sys
 from pathlib import Path
+from fastapi.testclient import TestClient
 import dotenv
 
-BASE_DIR = str(Path(__file__).parent.parent.resolve())
-dotenv.load_dotenv(f"{BASE_DIR}/.env")
+BASE_DIR = Path(__file__).parent.parent.resolve()
+ENV_PATH = BASE_DIR / ".env"
 
-PROTOCOL = 'http'
-HOST = '127.0.0.1'
-PORT = int(os.environ['PORT'])
+sys.path.append(BASE_DIR.as_posix())
+dotenv.load_dotenv(ENV_PATH.as_posix())
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_not_running = sock.connect_ex((HOST, PORT)) != 0
-if server_not_running:
-    print('Server is not running. All API tests will be skipped.')
+from main import app
 
-@unittest.skipIf(server_not_running, 'Works only when true')
+
 class TestServer(unittest.TestCase):
 
+    def setUp(self):
+        self.client = TestClient(app)
+
     def test__document_route(self):
-        response = self.call_route('/patents/US7654321B2')
-        self.assertEqual(200, response.status_code)
-        patent = response.json()
+        res = self.client.get("/patents/US7654321B2")
+        self.assertEqual(200, res.status_code)
+        patent = res.json()
         self.assertIsInstance(patent, dict)
-        self.assertEqual('US7654321B2', patent['publicationNumber'])
+        self.assertEqual("US7654321B2", patent["publicationNumber"])
+    
+    def test__document_route__not_found(self):
+        pn_ = "US987654321B3" # invalid patent number
+        res = self.client.get(f"/patents/{pn_}")
+        self.assertEqual(404, res.status_code)
 
     def test__drawing_listing_route(self):
-        response = self.call_route('/patents/US7654321B2/drawings')
-        self.assertEqual(200, response.status_code)
-        drawings = response.json()
+        res = self.client.get("/patents/US7654321B2/drawings")
+        self.assertEqual(200, res.status_code)
+        drawings = res.json().get("drawings")
         self.assertIsInstance(drawings, list)
         self.assertEqual(8, len(drawings))
+    
+    def test__drawing_listing_route__patent_not_found(self):
+        pn_ = "US987654321B3"  # invalid patent number
+        res = self.client.get(f"/patents/{pn_}/drawings")
+        self.assertEqual(404, res.status_code)
+    
+    def test__drawing_listing_route__patent_without_drawings(self):
+        pn = "US8507721B2"
+        res = self.client.get(f"/patents/{pn}/drawings")
+        self.assertEqual(404, res.status_code)
 
     def test__drawing_route(self):
-        response = self.call_route('/patents/US7654321B2/drawings/1')
-        self.assertEqual(200, response.status_code)
+        res = self.client.get("/patents/US7654321B2/drawings/1")
+        self.assertEqual(200, res.status_code)
+        self.assertEqual("image/tiff", res.headers["Content-Type"])
+        self.assertEqual(43060, len(res.content))
+    
+    def test__drawing_route__invalid_drawing_number(self):
+        res = self.client.get("/patents/US7654321B2/drawings/0")
+        self.assertEqual(404, res.status_code)
+    
+    def test__drawing_route__non_existent_patents_drawing(self):
+        pn_ = "US987654321B3"  # invalid patent number
+        res = self.client.get(f"/patents/{pn_}/drawings/1")
+        self.assertEqual(404, res.status_code)
 
-    @staticmethod
-    def call_route(route, method='get'):
-        """Make a GET request to a specific route
-        """
-        url = f'{PROTOCOL}://{HOST}:{PORT}' + route
-        response = getattr(requests, method)(url)
-        return response
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

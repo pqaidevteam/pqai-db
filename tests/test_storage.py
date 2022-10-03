@@ -14,19 +14,18 @@ sys.path.append(BASE_DIR)
 
 load_dotenv(f"{BASE_DIR}/.env")
 
-AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
-MONGO_HOST = os.environ.get('MONGO_HOST')
-MONGO_PORT = os.environ.get('MONGO_PORT')
-MONGO_USER = os.environ.get('MONGO_USER')
-MONGO_PASS = os.environ.get('MONGO_PASS')
+AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+MONGO_HOST = os.environ.get("MONGO_HOST")
+MONGO_PORT = os.environ.get("MONGO_PORT")
+MONGO_USER = os.environ.get("MONGO_USER")
+MONGO_PASS = os.environ.get("MONGO_PASS")
 MONGO_URI = f"mongodb://{MONGO_USER}:{MONGO_PASS}@{MONGO_HOST}:{MONGO_PORT}"
 
 from core.storage import LocalStorage, S3Bucket, MongoDB
 
 
 class TestLocalStorage(unittest.TestCase):
-    
     def setUp(self):
         self.root = f"{TEST_DIR}/test-data"
         self.storage = LocalStorage(self.root)
@@ -44,13 +43,13 @@ class TestLocalStorage(unittest.TestCase):
         self.assertTrue(exists)
         exists = self.storage.exists("patents/non-existent.json")
         self.assertFalse(exists)
-    
+
     def test__can_store_and_remove_items(self):
         key = "patents/test.json"
         path = f"{self.root}/{key}"
         if os.path.exists(path):
             os.remove(path)
-        
+
         data = bytes(json.dumps({"key": "value"}), "utf-8")
         self.storage.put(key, data)
         self.assertTrue(os.path.exists(path))
@@ -62,18 +61,15 @@ class TestLocalStorage(unittest.TestCase):
 
 
 class TestS3Bucket(unittest.TestCase):
-    
     def setUp(self):
         config = botocore.config.Config(
-            read_timeout=400,
-            connect_timeout=400,
-            retries={"max_attempts": 0}
+            read_timeout=400, connect_timeout=400, retries={"max_attempts": 0}
         )
         credentials = {
-            'aws_access_key_id': AWS_ACCESS_KEY_ID,
-            'aws_secret_access_key': AWS_SECRET_ACCESS_KEY
+            "aws_access_key_id": AWS_ACCESS_KEY_ID,
+            "aws_secret_access_key": AWS_SECRET_ACCESS_KEY,
         }
-        botoclient = boto3.client('s3', **credentials, config=config)
+        botoclient = boto3.client("s3", **credentials, config=config)
         bucket_name = "pqai.test1"
         self.storage = S3Bucket(botoclient, bucket_name)
 
@@ -90,13 +86,13 @@ class TestS3Bucket(unittest.TestCase):
         self.assertTrue(exists)
         exists = self.storage.exists("patents/nonexistent.json")
         self.assertFalse(exists)
-    
+
     def test__can_store_and_remove_items(self):
         key = "patents/test.json"
         if self.storage.exists(key):
             self.storage.remove(key)
         self.assertFalse(self.storage.exists(key))
-        
+
         data = bytes(json.dumps({"key": "value"}), "utf-8")
         self.storage.put(key, data)
         self.assertTrue(self.storage.exists(key))
@@ -106,7 +102,6 @@ class TestS3Bucket(unittest.TestCase):
 
 
 class TestMongoDB(unittest.TestCase):
-    
     def setUp(self):
         client = MongoClient(MONGO_URI)
         collections = [coll["name"] for coll in client.gamma.list_collections()]
@@ -130,13 +125,13 @@ class TestMongoDB(unittest.TestCase):
         self.assertTrue(exists)
         exists = self.storage.exists("nonexistent")
         self.assertFalse(exists)
-    
+
     def test__can_store_and_remove_items(self):
         key = "test"
         if self.storage.exists(key):
             self.storage.remove(key)
         self.assertFalse(self.storage.exists(key))
-        
+
         data = bytes(json.dumps({"publicationNumber": "US3344334A"}), "utf-8")
         self.storage.put(key, data)
         self.assertTrue(self.storage.exists(key))

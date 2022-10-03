@@ -18,10 +18,6 @@ REST API for storing and retrieving documents. Documents can belong to patent or
 |      | `GET`    | `/patents/[docId]/drawings`       | Returns a list of document’s drawing identifiers |
 |      | `GET`    | `/patents/[docId]/drawings/[n]`   | Returns a single patent drawing                  |
 | *    | `GET`    | `/patents/[docId]/thumbnails/[n]` | Returns a single patent thumbnail                |
-| *    | `PUT`    | `/patents/[docId]`                | Add (or overwrite) a new non-patent document     |
-| *    | `PUT`    | `/patents/[docId]/drawings/[n]`   | Add (or overwrite) a new drawing                 |
-| *    | `DELETE` | `/patents/[docId]`                | Delete an existing document                      |
-| *    | `DELETE` | `/patents/[docId]/drawings`       | Delete all drawings of a document                |
 
 *Yet to be implemented
 
