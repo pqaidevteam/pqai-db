@@ -1,0 +1,9 @@
+[run]
+branch = True
+
+[report]
+exclude_lines =
+    def __repr__
+    raise NotImplementedError
+    raise AssertionError
+    @(abc\.)?abstractmethod

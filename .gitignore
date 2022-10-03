@@ -13,3 +13,4 @@ venv.bak/
 mongo-volume/
 
 .vscode
+.coverage
