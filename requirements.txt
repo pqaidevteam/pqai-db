@@ -21,3 +21,4 @@ typing_extensions==4.0.1
 urllib3==1.26.8
 uvicorn==0.16.0
 pymongo==4.1.0
+opencv-python==4.6.0.66
