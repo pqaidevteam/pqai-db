@@ -64,7 +64,7 @@ def get_drawing_prefix(doc_id):
     return f"images/{num}-"
 
 
-@app.get("documents/{doc_id}")
+@app.get("/documents/{doc_id}")
 @app.get("/patents/{doc_id}")
 async def get_doc(doc_id: str):
     """Return a document's data in JSON format
@@ -74,8 +74,6 @@ async def get_doc(doc_id: str):
     except ClientError as e:
         if e.response["Error"]["Code"] == "NoSuchKey":
             return Response(status_code=404)
-        return Response(status_code=500)
-    except:
         return Response(status_code=500)
     return json.loads(doc)
 
@@ -105,8 +103,6 @@ async def get_drawing(doc_id: str, drawing_num: int):
     except ClientError as e:
         if e.response["Error"]["Code"] == "NoSuchKey":
             return Response(status_code=404)
-        return Response(status_code=500)
-    except:
         return Response(status_code=500)
     return Response(content=tif_data, media_type="image/tiff")
 
