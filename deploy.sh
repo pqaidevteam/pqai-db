@@ -14,6 +14,6 @@
 git checkout main
 git pull origin main
 
-docker build . -t pqai_db_api:latest
+docker build . -t pqai_db:latest
 docker-compose down
 docker-compose up -d
