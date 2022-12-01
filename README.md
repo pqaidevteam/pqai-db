@@ -8,6 +8,8 @@
 
 REST API for storing and retrieving documents. Documents can belong to patent or non-patent literature. The default format of data is JSON but other formats are supported. Drawings & figures are also supported.
 
+For more detailed information, please refer to [PQAI Wiki](https://github.com/pqaidevteam/pqai/wiki/pqai-db).
+
 ## Routes
 
 |      | Method   | Endpoint                          | Comments                                         |
