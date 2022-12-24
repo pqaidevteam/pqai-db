@@ -1,15 +1,13 @@
 version: '3'
 
 services:
-  pqai_db_api:
-    container_name: pqai_db_api_dev
+  pqai_db:
+    image: pqai_db
+    container_name: pqai_db
     build: .
-    command: bash -c "pip install --no-cache-dir --upgrade -r /code/requirements.txt && uvicorn main:app --host 0.0.0.0 --port 80 --reload"
     restart: always
-    ports: 
-      - 8000:80
-    volumes:
-      - ./:/app
+    ports:
+      - ${PORT}:80
     environment:
       - PORT=${PORT}
       - AWS_S3_BUCKET_NAME=${AWS_S3_BUCKET_NAME}

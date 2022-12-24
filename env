@@ -1,9 +1,12 @@
 PORT=80
 AWS_S3_BUCKET_NAME=<Your Bucket Name>
-S3_BUCKET_DRAWINGS=<Your Bucket Name>
 AWS_ACCESS_KEY_ID=<AWS Access KEY ID>
 AWS_SECRET_ACCESS_KEY=<AWS Secret Access Key>
 STORAGE=<'local' or 's3' or 'mongo'>
-MONGO_INITDB_ROOT_USERNAME=<MongoDB User>
-MONGO_INITDB_ROOT_PASSWORD=<MongoDB Password>
-LOCAL_STORAGE_ROOT=<Absolute local path where data is stored>
+LOCAL_STORAGE_ROOT=<path to directory with patent data>
+MONGO_HOST=<Mongo host IP>
+MONGO_PORT=27017
+MONGO_USER=<Mongo username>
+MONGO_PASS=<Mongo password>
+MONGO_DB=pqai
+MONGO_COLL=bibliography

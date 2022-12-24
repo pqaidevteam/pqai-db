@@ -1,79 +1,67 @@
-"""
-Test all server routes
-"""
 import unittest
-import os
-import socket
-import requests
-import testutil
+import sys
+from pathlib import Path
+from fastapi.testclient import TestClient
+import dotenv
 
-testutil.load_test_environment()
+BASE_DIR = Path(__file__).parent.parent.resolve()
+ENV_PATH = BASE_DIR / ".env"
 
-PROTOCOL = 'http'
-HOST = '127.0.0.1'
-PORT = int(os.environ['PORT'])
+sys.path.append(BASE_DIR.as_posix())
+dotenv.load_dotenv(ENV_PATH.as_posix())
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server_not_running = sock.connect_ex((HOST, PORT)) != 0
-if server_not_running:
-    print('Server is not running. All API tests will be skipped.')
+from main import app
 
-@unittest.skipIf(server_not_running, 'Works only when true')
+
 class TestServer(unittest.TestCase):
 
-    """Test the REST API routes
-    """
+    def setUp(self):
+        self.client = TestClient(app)
 
-    def test_document_route(self):
-        """Can retrieve a document's data
-        """
-        response = self.call_route('/docs/US7654321B2')
-        self.assertEqual(200, response.status_code)
-        patent = response.json()
+    def test__document_route(self):
+        res = self.client.get("/patents/US7654321B2")
+        self.assertEqual(200, res.status_code)
+        patent = res.json()
         self.assertIsInstance(patent, dict)
-        self.assertEqual('US7654321B2', patent['publicationNumber'])
+        self.assertEqual("US7654321B2", patent["publicationNumber"])
+    
+    def test__document_route__not_found(self):
+        pn_ = "US987654321B3" # invalid patent number
+        res = self.client.get(f"/patents/{pn_}")
+        self.assertEqual(404, res.status_code)
 
-    def test_drawing_listing_route(self):
-        """Can retrieve a list of drawings associated with a document
-        """
-        response = self.call_route('/docs/US7654321B2/drawings')
-        self.assertEqual(200, response.status_code)
-        drawings = response.json()
+    def test__drawing_listing_route(self):
+        res = self.client.get("/patents/US7654321B2/drawings")
+        self.assertEqual(200, res.status_code)
+        drawings = res.json().get("drawings")
         self.assertIsInstance(drawings, list)
         self.assertEqual(8, len(drawings))
+    
+    def test__drawing_listing_route__patent_not_found(self):
+        pn_ = "US987654321B3"  # invalid patent number
+        res = self.client.get(f"/patents/{pn_}/drawings")
+        self.assertEqual(404, res.status_code)
+    
+    def test__drawing_listing_route__patent_without_drawings(self):
+        pn = "US8507721B2"
+        res = self.client.get(f"/patents/{pn}/drawings")
+        self.assertEqual(404, res.status_code)
 
-    def test_drawing_route(self):
-        """Can obtain a drawing
-        """
-        response = self.call_route('/docs/US7654321B2/drawings/1')
-        self.assertEqual(200, response.status_code)
+    def test__drawing_route(self):
+        res = self.client.get("/patents/US7654321B2/drawings/1")
+        self.assertEqual(200, res.status_code)
+        self.assertEqual("image/tiff", res.headers["Content-Type"])
+        self.assertEqual(43060, len(res.content))
+    
+    def test__drawing_route__invalid_drawing_number(self):
+        res = self.client.get("/patents/US7654321B2/drawings/0")
+        self.assertEqual(404, res.status_code)
+    
+    def test__drawing_route__non_existent_patents_drawing(self):
+        pn_ = "US987654321B3"  # invalid patent number
+        res = self.client.get(f"/patents/{pn_}/drawings/1")
+        self.assertEqual(404, res.status_code)
 
-    def test_delete_route(self):
-        """ Can Delete File
-        """
-        pn = 'US7654321A2'
-        route = f'/docs/{pn}'
 
-        response = self.call_route(route, 'delete')
-        self.assertEqual(200, response.status_code)
-
-        response = self.call_route(route, 'delete')
-        self.assertEqual(404, response.status_code)
-
-    @staticmethod
-    def call_route(route, method='get'):
-        """Make a GET request to a specific route
-
-        Args:
-            route (str): Target route
-
-        Returns:
-            Response: Response object from `requests` module
-        """
-
-        url = f'{PROTOCOL}://{HOST}:{PORT}' + route
-        response = getattr(requests, method)(url)
-        return response
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
