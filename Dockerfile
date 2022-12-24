@@ -1,12 +1,10 @@
-FROM python:3.10
+FROM python:3.8
+WORKDIR /app
 
-WORKDIR /code
+COPY ./requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 
-COPY ./requirements.txt /code/requirements.txt
+COPY ./core /app/core
+COPY ./main.py /app/main.py
 
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
-
-COPY ./ /code/
-
-# CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
-# CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80", "--reload"] # For dev
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
