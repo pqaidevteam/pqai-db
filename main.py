@@ -14,6 +14,7 @@ from botocore.exceptions import ClientError
 import boto3
 import dotenv
 from fastapi import FastAPI, Response
+from utils import image
 
 dotenv.load_dotenv()
 
@@ -105,6 +106,24 @@ async def get_drawing(doc_id: str, drawing_num: int):
             return Response(status_code=404)
         return Response(status_code=500)
     return Response(content=tif_data, media_type="image/tiff")
+
+
+@app.get('/patents/{doc_id}/thumbnails/{thumbnail_num}')
+def get_patent_thumbnail(doc_id: str, thumbnail_num: str, w: int = 100, h: int = 100):
+    """Returns image data of a particular thumbnail.
+    """
+    if thumbnail_num < 1:
+        return Response(status_code=404)
+    prefix = get_drawing_prefix(doc_id)
+    key = f"{prefix}{thumbnail_num}.tif"
+    try:
+        tif_data = s3_storage.get(key)
+    except ClientError as e:
+        if e.response["Error"]["Code"] == "NoSuchKey":
+            return Response(status_code=404)
+        return Response(status_code=500)
+    tif_data_thumbnail = image.get_resized_image(tif_data, w, h)
+    return Response(content=tif_data_thumbnail, media_type="image/tiff")
 
 
 if __name__ == "__main__":

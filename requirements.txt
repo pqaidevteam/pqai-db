@@ -5,3 +5,4 @@ pymongo==4.1.0
 python-dotenv==0.21.0
 requests==2.27.1
 uvicorn==0.16.0
+opencv-python==4.6.0.66
